@@ -49,18 +49,10 @@ package org.firstinspires.ftc.teamcode;
              // Send calculated power to wheels
              testMotor.setPower(joystick_power);
 
-             float timeDelta = testEncoder.Update(testMotor.getCurrentPosition());
- 
-             // Show the elapsed game time and wheel power.
-//             telemetry.addData("Motors", "Power (%.2f)", joystick_power);
+             testEncoder.Update(testMotor.getCurrentPosition());
+
              telemetry.addData("Execution Rate", currentTimestamp - lastTimestamp );
-             if (timeDelta > 0)
-             {
-                 telemetry.addData("Last Delta", timeDelta);
-             }
-             telemetry.addData("Velocity rev/sec", testEncoder.GetVelocity());
-             telemetry.addData("Velocity rpm", testEncoder.GetVelocity() * 60);
-             telemetry.addData("Filtered Velocity rpm", testEncoder.getFilteredVelocity() * 60);
+
              telemetry.update();
 
              lastTimestamp = currentTimestamp;
