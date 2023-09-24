@@ -55,6 +55,6 @@ public class TaskScheduler
 
     public long GetCurrentTime()
     {
-        return this.runtime.now(TimeUnit.MICROSECONDS);
+        return this.runtime.time(TimeUnit.MICROSECONDS);
     }
 }

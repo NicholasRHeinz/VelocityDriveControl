@@ -64,6 +64,7 @@ package org.firstinspires.ftc.teamcode;
 
                  /* Call task functions here */
                  TestMotorPower();
+                 SendTelemetry();
 
                  /* Record end time */
                  taskScheduler.task_50ms.End(taskScheduler.GetCurrentTime());
@@ -80,7 +81,7 @@ package org.firstinspires.ftc.teamcode;
                  taskScheduler.task_250ms.Start(taskScheduler.GetCurrentTime());
 
                  /* Call task functions here */
-                 SendTelemetry();
+
 
                  /* Record end time */
                  taskScheduler.task_250ms.End(taskScheduler.GetCurrentTime());
@@ -92,20 +93,11 @@ package org.firstinspires.ftc.teamcode;
 
      private void SendTelemetry()
      {
-//       telemetry.addData("10ms Time", (float)taskScheduler.task_10ms.taskElapsedTime/1000);
-         telemetry.addData("10ms Interval", (float)taskScheduler.task_10ms.taskActualInterval/1000);
-         telemetry.addData("10ms Behind", taskScheduler.task_10ms.taskBehindSchedule);
-         telemetry.addData("10ms Behind Count", taskScheduler.task_10ms.taskBehindScheduleCount);
+         /* Task Scheduler Telemetry */
+         telemetry.addData("10ms Time", (float)taskScheduler.task_10ms.taskElapsedTime/1000);
+         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
+         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
 
-//         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
-         telemetry.addData("50ms Interval", (float)taskScheduler.task_50ms.taskActualInterval/1000);
-         telemetry.addData("50ms Behind", taskScheduler.task_50ms.taskBehindSchedule);
-         telemetry.addData("50ms Behind Count", taskScheduler.task_50ms.taskBehindScheduleCount);
-
-//         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
-         telemetry.addData("250ms Interval", (float)taskScheduler.task_250ms.taskActualInterval/1000);
-         telemetry.addData("250ms Behind", taskScheduler.task_250ms.taskBehindSchedule);
-         telemetry.addData("250ms Behind Count", taskScheduler.task_250ms.taskBehindScheduleCount);
          telemetry.update();
      }
 
@@ -117,7 +109,8 @@ package org.firstinspires.ftc.teamcode;
      private void CalculateMotorVelocity()
      {
          velocityEncoder.Update(testMotor.getCurrentPosition());
-         telemetry.addData("Velocity", velocityEncoder.GetVelocity());
+         telemetry.addData("Raw Velocity", velocityEncoder.GetVelocity());
+         telemetry.addData("Filtered Velocity", velocityEncoder.GetFilteredVelocity());
      }
  }
  

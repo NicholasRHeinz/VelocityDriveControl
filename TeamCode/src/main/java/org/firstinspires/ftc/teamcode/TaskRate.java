@@ -64,8 +64,8 @@ public class TaskRate {
                 this.schedulerTarget += this.taskRateInterval;
             }
 
+            /* The task ready to be run */
             this.taskReady = true;
-
         }
     }
 

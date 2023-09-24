@@ -154,7 +154,7 @@ public class VelocityEncoder {
         return this.instantVelocity;
     }
 
-    public float getFilteredVelocity() {
+    public float GetFilteredVelocity() {
         return filteredVelocity;
     }
 
