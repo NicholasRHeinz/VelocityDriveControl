@@ -11,7 +11,7 @@ public class TaskScheduler
      * <h1>Runtime timer</h1>
      * Primary timer for Task Scheduler
      */
-    private ElapsedTime runtime = null;
+    private ElapsedTime runtime;
 
     private long currentSchedulerTime;
 
@@ -31,9 +31,9 @@ public class TaskScheduler
         this.lastSchedulerTime = 0;
 
         /* Initialize Task Rates */
-        task_10ms = new TaskRate(10);
-        task_50ms = new TaskRate(50);
-        task_250ms = new TaskRate(250);
+        task_10ms = new TaskRate(10000);
+        task_50ms = new TaskRate(50000);
+        task_250ms = new TaskRate(250000);
 
     }
 
@@ -45,7 +45,7 @@ public class TaskScheduler
 
 
         /* Get current time */
-        this.currentSchedulerTime = this.runtime.now(TimeUnit.MILLISECONDS);
+        this.currentSchedulerTime = this.GetCurrentTime();
 
         /* Check each task rate */
         this.task_10ms.Check(this.currentSchedulerTime);
@@ -55,6 +55,6 @@ public class TaskScheduler
 
     public long GetCurrentTime()
     {
-        return this.runtime.now(TimeUnit.MILLISECONDS);
+        return this.runtime.now(TimeUnit.MICROSECONDS);
     }
 }

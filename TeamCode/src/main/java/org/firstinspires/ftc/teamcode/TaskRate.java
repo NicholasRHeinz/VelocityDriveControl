@@ -30,6 +30,10 @@ public class TaskRate {
 
     private long lastTaskStartTime;
 
+    public boolean taskBehindSchedule;
+
+    public int taskBehindScheduleCount;
+
     /**
      *
      * @param taskRateInterval Time in milliseconds between task execution
@@ -38,14 +42,30 @@ public class TaskRate {
         this.taskRateInterval = taskRateInterval;
         this.taskReady = false;
         this.schedulerTarget = taskRateInterval;
+        this.taskBehindSchedule = false;
+        this.taskBehindScheduleCount = 0;
     }
 
     public void Check(long currentSchedulerTime)
     {
         if (currentSchedulerTime >= this.schedulerTarget)
         {
+            /* If task is ready from the last schedule, that means its behind schedule */
+            this.taskBehindSchedule = this.taskReady;
+
+            /* If this task if behind schedule, update the count and reschedule based on current time */
+            if (this.taskBehindSchedule)
+            {
+                this.taskBehindScheduleCount += 1;
+                this.schedulerTarget = currentSchedulerTime += this.taskRateInterval;
+            }
+            else
+            {
+                this.schedulerTarget += this.taskRateInterval;
+            }
+
             this.taskReady = true;
-            this.schedulerTarget += this.taskRateInterval;
+
         }
     }
 
