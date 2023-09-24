@@ -1,61 +1,84 @@
 package org.firstinspires.ftc.teamcode;
 
  import com.acmerobotics.dashboard.FtcDashboard;
- import com.qualcomm.robotcore.eventloop.opmode.Disabled;
  import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
- import com.qualcomm.robotcore.hardware.DcMotor;
- import com.qualcomm.robotcore.util.ElapsedTime;
- import com.qualcomm.robotcore.util.Range;
 
- import java.util.concurrent.TimeUnit;
 
 @TeleOp(name="VelocityOpMode", group="Linear OpMode")
- public class VelocityOpMode extends LinearOpMode {
- 
-     // Declare OpMode members.
-     private ElapsedTime runtime = new ElapsedTime();
-     private DcMotor testMotor = null;
+ public class VelocityOpMode extends LinearOpMode
+{
 
-     private double lastTimestamp;
-     private double currentTimestamp;
-
-     private VelocityEncoder testEncoder = new VelocityEncoder((float)13.7);
-
+    private TaskScheduler taskScheduler = null;
  
      @Override
-     public void runOpMode() {
+     public void runOpMode()
+     {
          FtcDashboard dashboard = FtcDashboard.getInstance();
          telemetry = dashboard.getTelemetry();
 
-         testMotor  = hardwareMap.get(DcMotor.class, "117 rpm");
-         testMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
- 
+         taskScheduler = new TaskScheduler();
+
          // Wait for the game to start (driver presses PLAY)
          waitForStart();
-         runtime.reset();
-
-         currentTimestamp = runtime.now(TimeUnit.MICROSECONDS);
-         lastTimestamp = currentTimestamp;
  
          // run until the end of the match (driver presses STOP)
-         while (opModeIsActive()) {
-             currentTimestamp = runtime.now(TimeUnit.MICROSECONDS);
- 
-             // Setup a variable for each drive wheel to save power level for telemetry
-             double joystick_power;
-             joystick_power = -gamepad1.left_stick_y;
- 
-             // Send calculated power to wheels
-             testMotor.setPower(joystick_power);
+         while (opModeIsActive())
+         {
+             taskScheduler.Update();
 
-             testEncoder.Update(testMotor.getCurrentPosition());
+             /* Check if 10ms tasks should be run */
+             if (taskScheduler.task_10ms.taskReady)
+             {
+                 /* Clear ready flag so we don't run it again */
+                 taskScheduler.task_10ms.taskReady = false;
+                 /* Record start time */
+                 taskScheduler.task_10ms.Start(taskScheduler.GetCurrentTime());
 
-             telemetry.addData("Execution Rate", currentTimestamp - lastTimestamp );
+                 /* Place task functions here */
 
+
+                 /* Record end time */
+                 taskScheduler.task_10ms.End(taskScheduler.GetCurrentTime());
+                 telemetry.addData("10ms Time", taskScheduler.task_10ms.taskElapsedTime);
+                 telemetry.addData("10ms Interval", taskScheduler.task_10ms.taskActualInterval);
+             }
+
+             /* Check if 50ms tasks should be run */
+             if (taskScheduler.task_50ms.taskReady)
+             {
+                 /* Clear ready flag so we don't run it again */
+                 taskScheduler.task_50ms.taskReady = false;
+                 /* Record start time */
+                 taskScheduler.task_50ms.Start(taskScheduler.GetCurrentTime());
+
+                 /* Place task functions here */
+
+
+                 /* Record end time */
+                 taskScheduler.task_50ms.End(taskScheduler.GetCurrentTime());
+                 telemetry.addData("50ms Time", taskScheduler.task_50ms.taskElapsedTime);
+                 telemetry.addData("50ms Interval", taskScheduler.task_50ms.taskActualInterval);
+             }
+
+             /* Check if 250ms tasks should be run */
+             if (taskScheduler.task_250ms.taskReady)
+             {
+                 /* Clear ready flag so we don't run it again */
+                 taskScheduler.task_250ms.taskReady = false;
+                 /* Record start time */
+                 taskScheduler.task_250ms.Start(taskScheduler.GetCurrentTime());
+
+                 /* Place task functions here */
+
+
+                 /* Record end time */
+                 taskScheduler.task_250ms.End(taskScheduler.GetCurrentTime());
+                 telemetry.addData("250ms Time", taskScheduler.task_250ms.taskElapsedTime);
+                 telemetry.addData("250ms Interval", taskScheduler.task_250ms.taskActualInterval);
+             }
+             telemetry.addData("Runtime", taskScheduler.GetCurrentTime());
              telemetry.update();
-
-             lastTimestamp = currentTimestamp;
          }
      }
  }
