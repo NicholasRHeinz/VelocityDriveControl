@@ -32,7 +32,7 @@ package org.firstinspires.ftc.teamcode;
          // Wait for the game to start (driver presses PLAY)
          waitForStart();
  
-         // run until the end of the match (driver presses STOP)
+         /* Run Task Scheduler */
          while (opModeIsActive())
          {
              taskScheduler.Update();
@@ -45,11 +45,28 @@ package org.firstinspires.ftc.teamcode;
                  /* Record start time */
                  taskScheduler.task_10ms.Start(taskScheduler.GetCurrentTime());
 
-                 /* Call task functions here */
-                 CalculateMotorVelocity();
+                 /* Call task functions */
+                 taskFunction_10ms();
 
                  /* Record end time */
                  taskScheduler.task_10ms.End(taskScheduler.GetCurrentTime());
+             }
+
+             taskScheduler.Update();
+
+             /* Check if 20ms tasks should be run */
+             if (taskScheduler.task_20ms.taskReady)
+             {
+                 /* Clear ready flag so we don't run it again */
+                 taskScheduler.task_20ms.taskReady = false;
+                 /* Record start time */
+                 taskScheduler.task_20ms.Start(taskScheduler.GetCurrentTime());
+
+                 /* Call task functions */
+                 taskFunction_20ms();
+
+                 /* Record end time */
+                 taskScheduler.task_20ms.End(taskScheduler.GetCurrentTime());
              }
 
              taskScheduler.Update();
@@ -62,9 +79,8 @@ package org.firstinspires.ftc.teamcode;
                  /* Record start time */
                  taskScheduler.task_50ms.Start(taskScheduler.GetCurrentTime());
 
-                 /* Call task functions here */
-                 TestMotorPower();
-                 SendTelemetry();
+                 /* Call task functions */
+                 taskFunction_50ms();
 
                  /* Record end time */
                  taskScheduler.task_50ms.End(taskScheduler.GetCurrentTime());
@@ -80,21 +96,42 @@ package org.firstinspires.ftc.teamcode;
                  /* Record start time */
                  taskScheduler.task_250ms.Start(taskScheduler.GetCurrentTime());
 
-                 /* Call task functions here */
-
+                 /* Call task functions */
+                 taskFunction_250ms();
 
                  /* Record end time */
                  taskScheduler.task_250ms.End(taskScheduler.GetCurrentTime());
              }
-             telemetry.addData("Runtime", taskScheduler.GetCurrentTime());
 
          }
      }
+
+     private void taskFunction_10ms()
+     {
+         CalculateMotorVelocity();
+     }
+
+    private void taskFunction_20ms()
+    {
+        CalculateMotorVelocity();
+    }
+
+    private void taskFunction_50ms()
+    {
+        TestMotorPower();
+        SendTelemetry();
+    }
+
+    private void taskFunction_250ms()
+    {
+
+    }
 
      private void SendTelemetry()
      {
          /* Task Scheduler Telemetry */
          telemetry.addData("10ms Time", (float)taskScheduler.task_10ms.taskElapsedTime/1000);
+         telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
          telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
          telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
 

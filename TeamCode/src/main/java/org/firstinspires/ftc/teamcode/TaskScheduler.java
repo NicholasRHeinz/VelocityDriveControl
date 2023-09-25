@@ -18,6 +18,7 @@ public class TaskScheduler
     private long lastSchedulerTime;
 
     public TaskRate task_10ms;
+    public TaskRate task_20ms;
     public TaskRate task_50ms;
     public TaskRate task_250ms;
 
@@ -32,6 +33,7 @@ public class TaskScheduler
 
         /* Initialize Task Rates */
         task_10ms = new TaskRate(10000);
+        task_20ms = new TaskRate(20000);
         task_50ms = new TaskRate(50000);
         task_250ms = new TaskRate(250000);
 
@@ -49,6 +51,7 @@ public class TaskScheduler
 
         /* Check each task rate */
         this.task_10ms.Check(this.currentSchedulerTime);
+        this.task_20ms.Check(this.currentSchedulerTime);
         this.task_50ms.Check(this.currentSchedulerTime);
         this.task_250ms.Check(this.currentSchedulerTime);
     }
