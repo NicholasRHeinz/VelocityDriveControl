@@ -138,7 +138,7 @@ public class VelocityOpMode extends LinearOpMode
         telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
-        telemetry.addData("Table Result", testTable.Lookup(1, 2, telemetry));
+        telemetry.addData("Table Result", testTable.Lookup(1, 2));
 
         telemetry.update();
     }

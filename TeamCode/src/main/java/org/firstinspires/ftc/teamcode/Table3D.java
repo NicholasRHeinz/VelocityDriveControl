@@ -25,7 +25,7 @@ public class Table3D
      * @param Y
      * @return Table output value
      */
-    public float Lookup(float X, float Y, Telemetry telem)
+    public float Lookup(float X, float Y)
     {
         /* Locals */
         float lowerX = 0;
@@ -57,18 +57,18 @@ public class Table3D
         if (X <= this.tableX[0])
         {
             lowerX = this.tableX[0];
-            upperX = this.tableX[0];
+            upperX = this.tableX[1];
 
             lowerXIndex = 0;
-            upperXIndex = 0;
+            upperXIndex = 1;
         }
         /* Check if X if at or above the last x value in the table */
         else if (X >= this.tableX[tableX.length - 1])
         {
-            lowerX = this.tableX[tableX.length - 1];
+            lowerX = this.tableX[tableX.length - 2];
             upperX = this.tableX[tableX.length - 1];
 
-            lowerXIndex = tableX.length - 1;
+            lowerXIndex = tableX.length - 2;
             upperXIndex = tableX.length - 1;
         }
         /* X is somewhere in the middle, interpolate between two values */
@@ -93,19 +93,19 @@ public class Table3D
         /* Check if Y is below the first y value in the table */
         if (Y == this.tableY[0])
         {
-            lowerY = Y;
-            upperY = Y;
+            lowerY = this.tableY[0];
+            upperY = this.tableY[1];
 
             lowerYIndex = 0;
-            upperYIndex = 0;
+            upperYIndex = 1;
         }
         /* Check if Y if at or above the last y value in the table */
         else if (Y >= this.tableY[tableY.length - 1])
         {
-            lowerY = this.tableY[tableY.length - 1];
+            lowerY = this.tableY[tableY.length - 2];
             upperY = this.tableY[tableY.length - 1];
 
-            lowerYIndex = tableY.length - 1;
+            lowerYIndex = tableY.length - 2;
             upperYIndex = tableY.length - 1;
         }
         /* Y is somewhere in the middle, interpolate between two values */
@@ -142,9 +142,6 @@ public class Table3D
 
         output = ((upperY - Y) / (upperY - lowerY)) * R1 +
                 ((Y - lowerY) / (upperY - lowerY)) * R2;
-
-        telem.addData("out1", upperY);
-        telem.addData("out2", lowerY);
 
         return output;
     }
