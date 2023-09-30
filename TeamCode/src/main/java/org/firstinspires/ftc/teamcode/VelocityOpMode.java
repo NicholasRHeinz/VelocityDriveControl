@@ -15,10 +15,22 @@ public class VelocityOpMode extends LinearOpMode
     private DcMotor testMotor = null;
     private VelocityEncoder velocityEncoder = null;
 
-    private float[] testTableX = {0, 1, 2};
-    private float[] testTableY = {0, 1, 2};
-    private float[][] testTableZ = {{0, 1, 2}, {1, 2, 3}, {2, 3, 4}};
-    private Table3D testTable = null;
+    private final float[] modernRobotics_maxTorqueTbl_velocity = {-5900, -0, 0, 5900};
+    private final float[] modernRobotics_maxTorqueTbl_torque = {0, (float)-0.19, (float)0.19, 0};
+
+    private final float[] modernRobotics_powerTbl_velocity = {-5900, -0, 0, 5900};
+    private final float[] modernRobotics_powerTbl_torque = {(float)-0.19, 0, (float)0.19};
+    private final float[][] modernRobotics_powerTbl_power = {{1, 0, -1}, {1, 0, -1}, {-1, 0, 1}, {-1, 0, 1}};
+
+    private Table2D modernRobotics_maxTorqueTbl =
+            new Table2D(modernRobotics_maxTorqueTbl_velocity, modernRobotics_maxTorqueTbl_torque);
+
+    private Table3D modernRobotics_powerTbl =
+            new Table3D(modernRobotics_powerTbl_velocity,
+                        modernRobotics_powerTbl_torque,
+                        modernRobotics_powerTbl_power);
+
+    private TorqueActuator testTorqueActuator;
 
     @Override
     public void runOpMode()
@@ -34,7 +46,8 @@ public class VelocityOpMode extends LinearOpMode
         testMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         testMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        testTable = new Table3D(testTableX, testTableY, testTableZ);
+        testTorqueActuator =
+                new TorqueActuator(testMotor, modernRobotics_powerTbl, modernRobotics_maxTorqueTbl, (float)13.7);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -112,17 +125,16 @@ public class VelocityOpMode extends LinearOpMode
 
     private void taskFunction_10ms()
     {
-        CalculateMotorVelocity();
+
     }
 
     private void taskFunction_20ms()
     {
-        CalculateMotorVelocity();
+
     }
 
     private void taskFunction_50ms()
     {
-        TestMotorPower();
         SendTelemetry();
     }
 
@@ -138,21 +150,9 @@ public class VelocityOpMode extends LinearOpMode
         telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
-        telemetry.addData("Table Result", testTable.Lookup(1, 2));
 
         telemetry.update();
     }
 
-    private void TestMotorPower()
-    {
-        testMotor.setPower(-gamepad1.left_stick_y);
-    }
-
-    private void CalculateMotorVelocity()
-    {
-        velocityEncoder.Update(testMotor.getCurrentPosition());
-        telemetry.addData("Raw Velocity", velocityEncoder.GetVelocity());
-        telemetry.addData("Filtered Velocity", velocityEncoder.GetFilteredVelocity());
-    }
 }
  
