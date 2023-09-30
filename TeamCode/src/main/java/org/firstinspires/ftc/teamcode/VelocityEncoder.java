@@ -12,7 +12,7 @@ public class VelocityEncoder {
 
     /* Object Static Variables */
 
-    /* Local Variables */
+    /* Object Variables */
     /** <h1>Last Time</h1>
      * <b>Units:</b> microseconds
      */
@@ -53,7 +53,7 @@ public class VelocityEncoder {
     /**
      * <h1>Velocity Encoder</h1>
      * Helper object for calculating rev/sec from a standard encoder
-     * @param encoderGearRatio Multiplier between motor output speed and gearbox output speed
+     * @param encoderGearRatio Divider between motor output speed and gearbox output speed
      */
     public VelocityEncoder(float encoderGearRatio) {
         /* Locals */

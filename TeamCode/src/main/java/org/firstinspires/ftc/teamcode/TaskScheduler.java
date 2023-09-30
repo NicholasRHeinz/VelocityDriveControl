@@ -32,10 +32,10 @@ public class TaskScheduler
         this.lastSchedulerTime = 0;
 
         /* Initialize Task Rates */
-        task_10ms = new TaskRate(10000);
-        task_20ms = new TaskRate(20000);
-        task_50ms = new TaskRate(50000);
-        task_250ms = new TaskRate(250000);
+        this.task_10ms = new TaskRate(10000);
+        this.task_20ms = new TaskRate(20000);
+        this.task_50ms = new TaskRate(50000);
+        this.task_250ms = new TaskRate(250000);
 
     }
 

@@ -52,8 +52,6 @@ package org.firstinspires.ftc.teamcode;
                  taskScheduler.task_10ms.End(taskScheduler.GetCurrentTime());
              }
 
-             taskScheduler.Update();
-
              /* Check if 20ms tasks should be run */
              if (taskScheduler.task_20ms.taskReady)
              {
@@ -69,6 +67,7 @@ package org.firstinspires.ftc.teamcode;
                  taskScheduler.task_20ms.End(taskScheduler.GetCurrentTime());
              }
 
+             /* 10ms and 20ms will likely be the more common task rates so check tasks after */
              taskScheduler.Update();
 
              /* Check if 50ms tasks should be run */
@@ -85,8 +84,6 @@ package org.firstinspires.ftc.teamcode;
                  /* Record end time */
                  taskScheduler.task_50ms.End(taskScheduler.GetCurrentTime());
              }
-
-             taskScheduler.Update();
 
              /* Check if 250ms tasks should be run */
              if (taskScheduler.task_250ms.taskReady)
