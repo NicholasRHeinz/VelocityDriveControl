@@ -73,6 +73,7 @@ public class TorqueActuator
         boolean torqueMet;
 
         float maxTorqueAtCurrentVelocity;
+        float scaledRequestedTorque;
         float boundRequestedTorque;
 
         float commandedPower;
@@ -81,16 +82,20 @@ public class TorqueActuator
         final float MINIMUM_TORQUE = 0;
 
 
+        /* requestedTorque is torque at the gearbox output shaft, scale it back to the motor
+        /* output shaft */
+        scaledRequestedTorque = requestedTorque / this.torqueMultiplier;
+
         maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(currentVelocity);
 
         /* Requested torque is over what we can generate */
-        if (requestedTorque > maxTorqueAtCurrentVelocity)
+        if (Math.abs(scaledRequestedTorque) > maxTorqueAtCurrentVelocity)
         {
-            boundRequestedTorque = maxTorqueAtCurrentVelocity;
+            boundRequestedTorque = maxTorqueAtCurrentVelocity * Math.signum(scaledRequestedTorque);
             torqueMet = false;
         }
         /* Requested torque is under what we can generate */
-        else if (requestedTorque < MINIMUM_TORQUE)
+        else if (Math.abs(scaledRequestedTorque) < MINIMUM_TORQUE)
         {
             boundRequestedTorque = MINIMUM_TORQUE;
             torqueMet = false;
@@ -98,7 +103,7 @@ public class TorqueActuator
         /* We can generate the requested torque */
         else
         {
-            boundRequestedTorque = requestedTorque;
+            boundRequestedTorque = scaledRequestedTorque;
             torqueMet = true;
         }
 
@@ -106,7 +111,6 @@ public class TorqueActuator
         commandedPower = this.powerTable.Lookup(currentVelocity, boundRequestedTorque);
 
         this.dcMotor.setPower(commandedPower);
-
 
         return torqueMet;
     }

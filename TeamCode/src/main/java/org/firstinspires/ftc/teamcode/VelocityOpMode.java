@@ -125,7 +125,7 @@ public class VelocityOpMode extends LinearOpMode
 
     private void taskFunction_10ms()
     {
-
+        velocityEncoder.Update(testMotor.getCurrentPosition());
     }
 
     private void taskFunction_20ms()
