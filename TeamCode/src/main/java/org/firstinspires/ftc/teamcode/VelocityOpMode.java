@@ -5,6 +5,10 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.ftccommon.internal.manualcontrol.commands.AnalogCommands;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 @Config
@@ -12,11 +16,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class VelocityOpMode extends LinearOpMode
 {
     public static double TORQUE_REQUEST = 0.0;
-    public static double FILTER_CONSTANT = 0.3;
 
     private TaskScheduler taskScheduler = null;
 
     private DcMotor testMotor = null;
+    private DcMotorEx testMotorEx = null;
     private VelocityEncoder velocityEncoder = null;
 
     private final float[] modernRobotics_maxTorqueTbl_velocity = {0, 99};
@@ -36,6 +40,7 @@ public class VelocityOpMode extends LinearOpMode
         taskScheduler = new TaskScheduler();
 
         testMotor = hardwareMap.get(DcMotor.class, "117 rpm");
+        testMotorEx = (DcMotorEx)testMotor;
         velocityEncoder = new VelocityEncoder((float)13.7);
 
         testMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -142,7 +147,6 @@ public class VelocityOpMode extends LinearOpMode
 
     private void testMotorControl()
     {
-        velocityEncoder.setFilterTimeConstant((float)FILTER_CONSTANT);
         velocityEncoder.Update(testMotor.getCurrentPosition());
         testTorqueActuator.RequestTorque(velocityEncoder.GetFilteredVelocity(), (float)TORQUE_REQUEST);
     }
@@ -154,10 +158,9 @@ public class VelocityOpMode extends LinearOpMode
         telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
-        telemetry.addData("requestTorque", TORQUE_REQUEST);
-        telemetry.addData("Commanded Torque", testTorqueActuator.getCommandedTorque());
-        telemetry.addData("Set Power", testTorqueActuator.getSetPower());
-        telemetry.addData("Motor Velocity", velocityEncoder.GetFilteredVelocity());
+        telemetry.addData("Motor Velocity", velocityEncoder.GetFilteredVelocity()*60);
+        telemetry.addData("Raw Motor Velocity", velocityEncoder.GetVelocity()*60);
+        telemetry.addData("DcMotorEx Velocity", (float)(testMotorEx.getVelocity() * 60 / (13.7 * 28)));
 
         telemetry.update();
     }
