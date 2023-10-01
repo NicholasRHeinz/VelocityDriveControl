@@ -94,12 +94,6 @@ public class TorqueActuator
             boundRequestedTorque = maxTorqueAtCurrentVelocity * Math.signum(scaledRequestedTorque);
             torqueMet = false;
         }
-        /* Requested torque is under what we can generate */
-        else if (Math.abs(scaledRequestedTorque) < MINIMUM_TORQUE)
-        {
-            boundRequestedTorque = MINIMUM_TORQUE;
-            torqueMet = false;
-        }
         /* We can generate the requested torque */
         else
         {
@@ -111,9 +105,16 @@ public class TorqueActuator
         commandedPower = this.powerTable.Lookup(currentVelocity, boundRequestedTorque);
 
         this.dcMotor.setPower(commandedPower);
+        this.setPower = commandedPower;
 
         return torqueMet;
     }
 
+    public float getCommandedTorque() {
+        return commandedTorque;
+    }
 
+    public float getSetPower() {
+        return setPower;
+    }
 }

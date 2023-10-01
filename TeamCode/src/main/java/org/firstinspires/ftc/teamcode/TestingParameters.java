@@ -4,5 +4,5 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class TestingParameters {
-    public static float requestTorque;
+    public static float requestTorque = (float)0.0;
 }
