@@ -5,9 +5,13 @@ public class Table2D
     private float tableX[];
     private float tableZ[];
 
+    private boolean descendingX;
+
     public Table2D(float[] tableX, float[] tableZ) {
         this.tableX = tableX;
         this.tableZ = tableZ;
+
+        this.descendingX = false;
     }
 
     public float Lookup(float X)
@@ -27,38 +31,80 @@ public class Table2D
 
 
         /* Check if X is at or below the first x value in the table */
-        if (X <= this.tableX[0])
+        if (this.descendingX)
         {
-            lowerX = this.tableX[0];
-            upperX = this.tableX[1];
+            if (X >= this.tableX[0])
+            {
+                lowerX = this.tableX[0];
+                upperX = this.tableX[1];
 
-            lowerXIndex = 0;
-            upperXIndex = 1;
-        }
-        /* Check if X if at or above the last x value in the table */
-        else if (X >= this.tableX[tableX.length - 1])
-        {
-            lowerX = this.tableX[tableX.length - 2];
-            upperX = this.tableX[tableX.length - 1];
+                lowerXIndex = 0;
+                upperXIndex = 1;
+            }
+            /* Check if X if at or above the last x value in the table */
+            else if (X <= this.tableX[tableX.length - 1])
+            {
+                lowerX = this.tableX[tableX.length - 1];
+                upperX = this.tableX[tableX.length - 2];
 
-            lowerXIndex = tableX.length - 2;
-            upperXIndex = tableX.length - 1;
+                lowerXIndex = tableX.length - 1;
+                upperXIndex = tableX.length - 2;
+            }
+            /* X is somewhere in the middle, interpolate between two values */
+            else
+            {
+                /* Find upper and lower X values */
+                for (int i=0; i<this.tableX.length; i++)
+                {
+                    if (this.tableX[i] < X)
+                    {
+                        /* We're now above table x value, set the lower and upper limits then break */
+                        lowerX = this.tableX[i];
+                        upperX = this.tableX[i-1];
+
+                        lowerXIndex = i;
+                        upperXIndex = i-1;
+                        break;
+                    }
+                }
+            }
         }
-        /* X is somewhere in the middle, interpolate between two values */
+        /* X is ascending */
         else
         {
-            /* Find upper and lower X values */
-            for (int i=0; i<this.tableX.length; i++)
+            if (X <= this.tableX[0])
             {
-                if (this.tableX[i] < X)
-                {
-                    /* We're now above table x value, set the lower and upper limits then break */
-                    lowerX = this.tableX[i];
-                    upperX = this.tableX[i+1];
+                lowerX = this.tableX[0];
+                upperX = this.tableX[1];
 
-                    lowerXIndex = i;
-                    upperXIndex = i + 1;
-                    break;
+                lowerXIndex = 0;
+                upperXIndex = 1;
+            }
+            /* Check if X if at or above the last x value in the table */
+            else if (X >= this.tableX[tableX.length - 1])
+            {
+                lowerX = this.tableX[tableX.length - 2];
+                upperX = this.tableX[tableX.length - 1];
+
+                lowerXIndex = tableX.length - 2;
+                upperXIndex = tableX.length - 1;
+            }
+            /* X is somewhere in the middle, interpolate between two values */
+            else
+            {
+                /* Find upper and lower X values */
+                for (int i=0; i<this.tableX.length; i++)
+                {
+                    if (this.tableX[i] > X)
+                    {
+                        /* We're now above table x value, set the lower and upper limits then break */
+                        lowerX = this.tableX[i-1];
+                        upperX = this.tableX[i];
+
+                        lowerXIndex = i - 1;
+                        upperXIndex = i;
+                        break;
+                    }
                 }
             }
         }
@@ -71,4 +117,9 @@ public class Table2D
 
         return output;
     }
+
+    public void setDescendingX(boolean descendingX) {
+        this.descendingX = descendingX;
+    }
+
 }

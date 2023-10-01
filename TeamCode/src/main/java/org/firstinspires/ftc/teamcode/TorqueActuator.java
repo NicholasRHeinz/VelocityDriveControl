@@ -52,10 +52,9 @@ public class TorqueActuator
      */
     private float requestedTorque;
 
-    public TorqueActuator(DcMotor dcMotor, Table3D powerTable, Table2D maxTorqueTable, float torqueMultiplier)
+    public TorqueActuator(DcMotor dcMotor, Table2D maxTorqueTable, float torqueMultiplier)
     {
         this.dcMotor = dcMotor;
-        this.powerTable = powerTable;
         this.maxTorqueTable = maxTorqueTable;
         this.torqueMultiplier = torqueMultiplier;
     }
@@ -73,43 +72,46 @@ public class TorqueActuator
         boolean torqueMet;
 
         float maxTorqueAtCurrentVelocity;
+        float scaledRequestedTorque;
         float boundRequestedTorque;
 
         float commandedPower;
 
         /* Constants */
-        final float MINIMUM_TORQUE = 0;
 
 
-        maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(currentVelocity);
+        /* requestedTorque is torque at the gearbox output shaft, scale it back to the motor
+        /* output shaft */
+        scaledRequestedTorque = requestedTorque / this.torqueMultiplier;
+
+        maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(Math.abs(currentVelocity) * this.torqueMultiplier);
 
         /* Requested torque is over what we can generate */
-        if (requestedTorque > maxTorqueAtCurrentVelocity)
+        if (Math.abs(scaledRequestedTorque) > maxTorqueAtCurrentVelocity)
         {
-            boundRequestedTorque = maxTorqueAtCurrentVelocity;
-            torqueMet = false;
-        }
-        /* Requested torque is under what we can generate */
-        else if (requestedTorque < MINIMUM_TORQUE)
-        {
-            boundRequestedTorque = MINIMUM_TORQUE;
+            boundRequestedTorque = maxTorqueAtCurrentVelocity * Math.signum(scaledRequestedTorque);
             torqueMet = false;
         }
         /* We can generate the requested torque */
         else
         {
-            boundRequestedTorque = requestedTorque;
+            boundRequestedTorque = scaledRequestedTorque;
             torqueMet = true;
         }
 
-        this.commandedTorque = boundRequestedTorque;
-        commandedPower = this.powerTable.Lookup(currentVelocity, boundRequestedTorque);
+        this.commandedTorque = boundRequestedTorque * torqueMultiplier;
 
-        this.dcMotor.setPower(commandedPower);
-
+        this.setPower = boundRequestedTorque / maxTorqueAtCurrentVelocity;
+        this.dcMotor.setPower(this.setPower);
 
         return torqueMet;
     }
 
+    public float getCommandedTorque() {
+        return commandedTorque;
+    }
 
+    public float getSetPower() {
+        return setPower;
+    }
 }

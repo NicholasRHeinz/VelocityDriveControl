@@ -1,34 +1,29 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
+@Config
 @TeleOp(name="VelocityOpMode", group="Linear OpMode")
 public class VelocityOpMode extends LinearOpMode
 {
+    public static double TORQUE_REQUEST = 0.0;
+    public static double FILTER_CONSTANT = 0.3;
 
     private TaskScheduler taskScheduler = null;
 
     private DcMotor testMotor = null;
     private VelocityEncoder velocityEncoder = null;
 
-    private final float[] modernRobotics_maxTorqueTbl_velocity = {-5900, -0, 0, 5900};
-    private final float[] modernRobotics_maxTorqueTbl_torque = {0, (float)-0.19, (float)0.19, 0};
-
-    private final float[] modernRobotics_powerTbl_velocity = {-5900, -0, 0, 5900};
-    private final float[] modernRobotics_powerTbl_torque = {(float)-0.19, 0, (float)0.19};
-    private final float[][] modernRobotics_powerTbl_power = {{1, 0, -1}, {1, 0, -1}, {-1, 0, 1}, {-1, 0, 1}};
+    private final float[] modernRobotics_maxTorqueTbl_velocity = {0, 99};
+    private final float[] modernRobotics_maxTorqueTbl_torque = {(float)0.19, 0};
 
     private Table2D modernRobotics_maxTorqueTbl =
             new Table2D(modernRobotics_maxTorqueTbl_velocity, modernRobotics_maxTorqueTbl_torque);
-
-    private Table3D modernRobotics_powerTbl =
-            new Table3D(modernRobotics_powerTbl_velocity,
-                        modernRobotics_powerTbl_torque,
-                        modernRobotics_powerTbl_power);
 
     private TorqueActuator testTorqueActuator;
 
@@ -47,7 +42,9 @@ public class VelocityOpMode extends LinearOpMode
         testMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         testTorqueActuator =
-                new TorqueActuator(testMotor, modernRobotics_powerTbl, modernRobotics_maxTorqueTbl, (float)13.7);
+                new TorqueActuator(testMotor, modernRobotics_maxTorqueTbl, (float)13.7);
+
+        modernRobotics_maxTorqueTbl.setDescendingX(true);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -125,22 +122,29 @@ public class VelocityOpMode extends LinearOpMode
 
     private void taskFunction_10ms()
     {
-
+        testMotorControl();
     }
 
     private void taskFunction_20ms()
     {
-
+        SendTelemetry();
     }
 
     private void taskFunction_50ms()
     {
-        SendTelemetry();
+
     }
 
     private void taskFunction_250ms()
     {
 
+    }
+
+    private void testMotorControl()
+    {
+        velocityEncoder.setFilterTimeConstant((float)FILTER_CONSTANT);
+        velocityEncoder.Update(testMotor.getCurrentPosition());
+        testTorqueActuator.RequestTorque(velocityEncoder.GetFilteredVelocity(), (float)TORQUE_REQUEST);
     }
 
     private void SendTelemetry()
@@ -150,6 +154,10 @@ public class VelocityOpMode extends LinearOpMode
         telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
+        telemetry.addData("requestTorque", TORQUE_REQUEST);
+        telemetry.addData("Commanded Torque", testTorqueActuator.getCommandedTorque());
+        telemetry.addData("Set Power", testTorqueActuator.getSetPower());
+        telemetry.addData("Motor Velocity", velocityEncoder.GetFilteredVelocity());
 
         telemetry.update();
     }
