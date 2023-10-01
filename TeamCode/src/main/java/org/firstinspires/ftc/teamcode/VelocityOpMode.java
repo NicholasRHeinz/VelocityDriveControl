@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class VelocityOpMode extends LinearOpMode
 {
     public static double TORQUE_REQUEST = 0.0;
+    public static double FILTER_CONSTANT = 0.3;
 
     private TaskScheduler taskScheduler = null;
 
@@ -141,6 +142,7 @@ public class VelocityOpMode extends LinearOpMode
 
     private void testMotorControl()
     {
+        velocityEncoder.setFilterTimeConstant((float)FILTER_CONSTANT);
         velocityEncoder.Update(testMotor.getCurrentPosition());
         testTorqueActuator.RequestTorque(velocityEncoder.GetFilteredVelocity(), (float)TORQUE_REQUEST);
     }

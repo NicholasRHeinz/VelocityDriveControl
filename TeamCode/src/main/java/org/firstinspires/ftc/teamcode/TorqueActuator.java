@@ -78,14 +78,13 @@ public class TorqueActuator
         float commandedPower;
 
         /* Constants */
-        final float MINIMUM_TORQUE = 0;
 
 
         /* requestedTorque is torque at the gearbox output shaft, scale it back to the motor
         /* output shaft */
         scaledRequestedTorque = requestedTorque / this.torqueMultiplier;
 
-        maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(currentVelocity * this.torqueMultiplier);
+        maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(Math.abs(currentVelocity) * this.torqueMultiplier);
 
         /* Requested torque is over what we can generate */
         if (Math.abs(scaledRequestedTorque) > maxTorqueAtCurrentVelocity)

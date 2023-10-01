@@ -48,7 +48,7 @@ public class VelocityEncoder {
      * <h1>Filtered Velocity Time Constant</h1>
      * Value 0-1 of how much of the delta instant velocity to add to the filtered velocity
      */
-    private float filterTimeConstant = (float)0.20;
+    private float filterTimeConstant = (float)0.30;
 
     /**
      * <h1>Velocity Encoder</h1>
