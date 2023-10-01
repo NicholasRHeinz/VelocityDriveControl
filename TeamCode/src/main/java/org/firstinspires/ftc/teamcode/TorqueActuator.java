@@ -52,10 +52,9 @@ public class TorqueActuator
      */
     private float requestedTorque;
 
-    public TorqueActuator(DcMotor dcMotor, Table3D powerTable, Table2D maxTorqueTable, float torqueMultiplier)
+    public TorqueActuator(DcMotor dcMotor, Table2D maxTorqueTable, float torqueMultiplier)
     {
         this.dcMotor = dcMotor;
-        this.powerTable = powerTable;
         this.maxTorqueTable = maxTorqueTable;
         this.torqueMultiplier = torqueMultiplier;
     }
@@ -86,7 +85,7 @@ public class TorqueActuator
         /* output shaft */
         scaledRequestedTorque = requestedTorque / this.torqueMultiplier;
 
-        maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(currentVelocity);
+        maxTorqueAtCurrentVelocity = this.maxTorqueTable.Lookup(currentVelocity * this.torqueMultiplier);
 
         /* Requested torque is over what we can generate */
         if (Math.abs(scaledRequestedTorque) > maxTorqueAtCurrentVelocity)
@@ -101,11 +100,10 @@ public class TorqueActuator
             torqueMet = true;
         }
 
-        this.commandedTorque = boundRequestedTorque;
-        commandedPower = this.powerTable.Lookup(currentVelocity, boundRequestedTorque);
+        this.commandedTorque = boundRequestedTorque * torqueMultiplier;
 
-        this.dcMotor.setPower(commandedPower);
-        this.setPower = commandedPower;
+        this.setPower = boundRequestedTorque / maxTorqueAtCurrentVelocity;
+        this.dcMotor.setPower(this.setPower);
 
         return torqueMet;
     }

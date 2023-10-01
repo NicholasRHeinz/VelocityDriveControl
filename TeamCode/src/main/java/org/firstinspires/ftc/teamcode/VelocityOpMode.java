@@ -18,20 +18,11 @@ public class VelocityOpMode extends LinearOpMode
     private DcMotor testMotor = null;
     private VelocityEncoder velocityEncoder = null;
 
-    private final float[] modernRobotics_maxTorqueTbl_velocity = {0, 5900};
+    private final float[] modernRobotics_maxTorqueTbl_velocity = {0, 99};
     private final float[] modernRobotics_maxTorqueTbl_torque = {(float)0.19, 0};
-
-    private final float[] modernRobotics_powerTbl_velocity = {0, 5900};
-    private final float[] modernRobotics_powerTbl_torque = {(float)0.19, 0};
-    private final float[][] modernRobotics_powerTbl_power = {{1, 0}, {}};
 
     private Table2D modernRobotics_maxTorqueTbl =
             new Table2D(modernRobotics_maxTorqueTbl_velocity, modernRobotics_maxTorqueTbl_torque);
-
-    private Table3D modernRobotics_powerTbl =
-            new Table3D(modernRobotics_powerTbl_velocity,
-                        modernRobotics_powerTbl_torque,
-                        modernRobotics_powerTbl_power);
 
     private TorqueActuator testTorqueActuator;
 
@@ -50,7 +41,7 @@ public class VelocityOpMode extends LinearOpMode
         testMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         testTorqueActuator =
-                new TorqueActuator(testMotor, modernRobotics_powerTbl, modernRobotics_maxTorqueTbl, (float)13.7);
+                new TorqueActuator(testMotor, modernRobotics_maxTorqueTbl, (float)13.7);
 
         modernRobotics_maxTorqueTbl.setDescendingX(true);
 
@@ -164,6 +155,7 @@ public class VelocityOpMode extends LinearOpMode
         telemetry.addData("requestTorque", TORQUE_REQUEST);
         telemetry.addData("Commanded Torque", testTorqueActuator.getCommandedTorque());
         telemetry.addData("Set Power", testTorqueActuator.getSetPower());
+        telemetry.addData("Motor Velocity", velocityEncoder.GetFilteredVelocity());
 
         telemetry.update();
     }
