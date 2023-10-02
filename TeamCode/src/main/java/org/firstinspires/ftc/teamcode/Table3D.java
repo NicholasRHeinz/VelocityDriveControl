@@ -25,7 +25,7 @@ public class Table3D
     }
 
     /**
-     * <h1>Lookup</h1>
+     * <h3>Lookup</h3>
      * Lookup value from a 3D table<br>
      * Implementation based off of https://www.omnicalculator.com/math/bilinear-interpolation#bilinear-interpolation-formula
      * @param X

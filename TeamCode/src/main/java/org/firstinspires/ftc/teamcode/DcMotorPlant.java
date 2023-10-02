@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 /**
- * <h1>DC Motor Plant Model</h1>
- * Physic model for a basic DC Motor based on the FRC
+ * <h3>DC Motor Plant Model</h3>
+ * Physics model for a basic DC Motor based on the FRC
  * edu.wpi.first.math.system.plant DCMotor class
  */
 public class DcMotorPlant

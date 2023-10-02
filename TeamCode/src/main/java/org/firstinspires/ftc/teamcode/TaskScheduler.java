@@ -8,7 +8,7 @@ public class TaskScheduler
 {
 
     /**
-     * <h1>Runtime timer</h1>
+     * <h3>Runtime timer</h3>
      * Primary timer for Task Scheduler
      */
     private ElapsedTime runtime;

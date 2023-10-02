@@ -2,18 +2,18 @@ package org.firstinspires.ftc.teamcode;
 
 public class TaskRate {
     /**
-     * <h1>Task Rate Ready</h1>
+     * <h3>Task Rate Ready</h3>
      */
     public boolean taskReady;
 
     /**
-     * <h1>Scheduler Target</h1>
+     * <h3>Scheduler Target</h3>
      * Scheduler time to trigger this
      */
     public long schedulerTarget;
 
     /**
-     * <h1>Task Rate Interval</h1>
+     * <h3>Task Rate Interval</h3>
      * Time in milliseconds between task execution
      */
     public long taskRateInterval;
@@ -21,7 +21,7 @@ public class TaskRate {
     public long taskActualInterval;
 
     /**
-     * <h1>Task Elapsed Time</h1>
+     * <h3>Task Elapsed Time</h3>
      * Time required to execute functions in this task rate
      */
     public long taskElapsedTime;

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 /* Includes */
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-/** <h1>Velocity Motor</h1>
+/** <h3>Velocity Motor</h3>
  * DC motor Class with advanced controls
  */
 public class VelocityMotor
@@ -12,26 +12,26 @@ public class VelocityMotor
 
     /* Object Variables */
     /**
-     * <h1>Motor</h1>
+     * <h3>Motor</h3>
      * Reference to the DcMotor object
      */
     private DcMotor motor;
 
     /**
-     * <h1>Motor Encoder</h1>
+     * <h3>Motor Encoder</h3>
      * Velocity Encoder object for the Motor object
      */
     private VelocityEncoder motorEncoder;
 
     /**
-     * <h1>Velocity Target</h1>
+     * <h3>Velocity Target</h3>
      * Target output shaft velocity<br>
      * <b>Units:</b> rev/sec
      */
     private float velocityTarget;
 
     /**
-     * <h1>Velocity Error</h1>
+     * <h3>Velocity Error</h3>
      * Difference between current and target velocity<br>
      * <b>Units:</b> rev/sec
      */
@@ -50,7 +50,7 @@ public class VelocityMotor
     /* END OF DATA DEFINITION SECTION */
 
     /**
-     * <h1>Velocity Motor</h1>
+     * <h3>Velocity Motor</h3>
      * Object for controlling the velocity of a standard
      * DC motor
      * @param motor DcMotor Object to control

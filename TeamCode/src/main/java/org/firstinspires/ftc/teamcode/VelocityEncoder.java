@@ -13,25 +13,25 @@ public class VelocityEncoder {
     /* Object Static Variables */
 
     /* Object Variables */
-    /** <h1>Last Time</h1>
+    /** <h3>Last Time</h3>
      * <b>Units:</b> microseconds
      */
     private float lastMicroSecondTime_fl;
 
-    /** <h1>Last Encoder Count</h1>
+    /** <h3>Last Encoder Count</h3>
      *  <b>Units:</b> Encoder Counts
      */
     private int lastEncoderCount_int;
     private ElapsedTime runtime;
 
     /**
-     * <h1>Last calculated velocity</h1>
+     * <h3>Last calculated velocity</h3>
      * <b>Units:</b> rev/sec
      */
     private float instantVelocity;
 
     /**
-     * <h1>Filtered Velocity</h1>
+     * <h3>Filtered Velocity</h3>
      * <b>Units:</b> rev/sec
      */
     private float filteredVelocity;
@@ -39,19 +39,19 @@ public class VelocityEncoder {
     private boolean velocitySynched;
 
     /**
-     * <h1>Gear Ratio</h1>
+     * <h3>Gear Ratio</h3>
      * Multiplier between motor output speed and gearbox output speed
      */
     private float gearRatio;
 
     /**
-     * <h1>Filtered Velocity Time Constant</h1>
+     * <h3>Filtered Velocity Time Constant</h3>
      * Value 0-1 of how much of the delta instant velocity to add to the filtered velocity
      */
     private float filterTimeConstant = (float)0.30;
 
     /**
-     * <h1>Velocity Encoder</h1>
+     * <h3>Velocity Encoder</h3>
      * Helper object for calculating rev/sec from a standard encoder
      * @param encoderGearRatio Divider between motor output speed and gearbox output speed
      */

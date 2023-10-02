@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class TorqueActuator
 {
     /**
-     * <h1>DC Motor</h1>
+     * <h3>DC Motor</h3>
      * Reference to a DcMotor object
      */
     private DcMotor dcMotor;
 
     /**
-     * <h1>Power Lookup Table</h1>
+     * <h3>Power Lookup Table</h3>
      * <b>X - </b>Motor Velocity (rev/sec)<br>
      * <b>Y - </b>Motor Torque (Nm)<br>
      * <b>Z - </b>Output Power (% 0-1)
@@ -19,7 +19,7 @@ public class TorqueActuator
     private Table3D powerTable;
 
     /**
-     * <h1>Max Torque Table</h1>
+     * <h3>Max Torque Table</h3>
      * Maximum torque the motor can deliver at the current velocity<br>
      * <b>X - </b>Motor Velocity (rev/sec)<br>
      * <b>Z - </b>Motor Torque (Nm)<br>
@@ -27,26 +27,26 @@ public class TorqueActuator
     private Table2D maxTorqueTable;
 
     /**
-     * <h1>Torque Multiplier</h1>
+     * <h3>Torque Multiplier</h3>
      * Multiplier between the DC motor output and the Gearbox output shaft
      */
     private float torqueMultiplier;
 
     /**
-     * <h1>Commanded Torque</h1>
+     * <h3>Commanded Torque</h3>
      * Torque command sent to the motor<br>
      * <b>Units:</b> Nm
      */
     private float commandedTorque;
 
     /**
-     * <h1>Set Power</h1>
+     * <h3>Set Power</h3>
      * Power sent to the motor (% 0-1)
      */
     private float setPower;
 
     /**
-     * <h1>Requested Torque</h1>
+     * <h3>Requested Torque</h3>
      * Torque requested for the motor to produce<br>
      * <b>Units:</b> Nm
      */
@@ -60,7 +60,7 @@ public class TorqueActuator
     }
 
     /**
-     * <h1>Request Torque</h1>
+     * <h3>Request Torque</h3>
      * @param currentVelocity Current velocity of the motor in rev/sec
      * @param requestedTorque Torque requested in Nm
      * @return True - Torque Actuator could meet request<br>
