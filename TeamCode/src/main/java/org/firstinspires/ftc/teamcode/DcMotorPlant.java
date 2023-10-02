@@ -7,6 +7,10 @@ package org.firstinspires.ftc.teamcode;
  */
 public class DcMotorPlant
 {
+    /* Static Variables */
+    private static final double RPM_TO_RAD_PER_SEC = (2 * Math.PI / 60);
+
+    /* Instance Variables */
     private final double nominalVoltage_volts;
     private final double stallTorque_newtonMeters;
     private final double stallCurrent_amps;
@@ -35,7 +39,6 @@ public class DcMotorPlant
         /* CONSTANTS */
 
 
-
         this.nominalVoltage_volts = nominalVoltage_volts;
         this.stallTorque_newtonMeters = stallTorque_newtonMeters;
         this.stallCurrent_amps = stallCurrent_amps;
@@ -50,6 +53,77 @@ public class DcMotorPlant
                         (nominalVoltage_volts - this.resistance_ohms * freeCurrent_amps);
         //TODO: Shouldn't the free current be subtracted from stallCurrent?
         this.Kt_newtonMeterPerAmp = stallTorque_newtonMeters / stallCurrent_amps;
+    }
+
+    /**
+     * Estimate the current draw based on known speed and input voltage
+     * @param speed_rpm Angular velocity in rev/min
+     * @param voltageInput_volts Input Voltage
+     * @return Estimated current draw in Amps
+     */
+    public double getCurrent(double speed_rpm, double voltageInput_volts)
+    {
+        /* LOCALS */
+
+        /* CONSTANTS */
+
+
+        //TODO: Make this not a horrible looking equation
+        return -1.0 / Kv_radiansPerSecondVolt / resistance_ohms * (RPM_TO_RAD_PER_SEC * speed_rpm) + 1.0 / resistance_ohms * voltageInput_volts;
+    }
+
+    /**
+     * Estimate the generated torque based on known current draw
+     * @param currentDraw_amps Current draw in Amps
+     * @return Estimated torque generated in Nm
+     */
+    public double getTorque(double currentDraw_amps)
+    {
+        /* LOCALS */
+
+        /* CONSTANTS */
+
+
+        return currentDraw_amps * Kt_newtonMeterPerAmp;
+    }
+
+    /**
+     * Estimate the required voltage input to generate a desired torque and speed
+     * @param torque_Nm Desired torque in Nm
+     * @param speed_rpm Desired speed in rev/min
+     * @return Estimated input voltage required
+     */
+    public double getVoltage(double torque_Nm, double speed_rpm)
+    {
+        /* LOCALS */
+        double speed_radPerSec;
+
+        /* CONSTANTS */
+
+
+        /* Convert angular velocity to radians per second for equation */
+        speed_radPerSec = speed_rpm * RPM_TO_RAD_PER_SEC;
+
+        return 1.0 / Kv_radiansPerSecondVolt * speed_radPerSec +
+                1.0 / Kt_newtonMeterPerAmp * resistance_ohms * torque_Nm;
+    }
+
+    /**
+     * Estimate the speed based on torque and input voltage
+     * @param torque_nm Output torque in Nm
+     * @param voltageInput_volts Input voltage in Volts
+     * @return Estimated motor speed in rpm
+     */
+    public double getSpeed(double torque_nm, double voltageInput_volts)
+    {
+        /* LOCALS */
+
+        /* CONSTANTS */
+
+
+        return (voltageInput_volts * Kv_radiansPerSecondVolt -
+                1.0 / Kt_newtonMeterPerAmp * torque_nm * resistance_ohms * Kv_radiansPerSecondVolt)
+                / RPM_TO_RAD_PER_SEC;
     }
 
     /**
@@ -83,7 +157,7 @@ public class DcMotorPlant
         double angularVelocityScaled;
 
         /* CONSTANTS */
-        final double RPM_TO_RAD_PER_SEC = (2 * Math.PI / 60);
+
 
         reduction = empirical_rpm / 6000;
         angularVelocityScaled = empirical_rpm  * RPM_TO_RAD_PER_SEC;
