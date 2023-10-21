@@ -5,19 +5,29 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 
 @Config
 @TeleOp(name="VelocityOpMode", group="Linear OpMode")
 public class VelocityOpMode extends LinearOpMode
 {
-    public static double TORQUE_REQUEST = 0.0;
     public static double FILTER_CONSTANT = 0.3;
 
     private TaskScheduler taskScheduler = null;
 
-    private DcMotor testMotor = null;
-    private VelocityEncoder velocityEncoder = null;
+    private DcMotor m_front_right = null;
+    private DcMotor m_front_left = null;
+    private DcMotor m_back_right = null;
+    private DcMotor m_back_left = null;
+    private VelocityEncoder fr_vel_enc = null;
+    private VelocityEncoder fl_vel_enc = null;
+    private VelocityEncoder br_vel_enc = null;
+    private VelocityEncoder bl_vel_enc = null;
 
     private final float[] modernRobotics_maxTorqueTbl_velocity = {0, 99};
     private final float[] modernRobotics_maxTorqueTbl_torque = {(float)0.19, 0};
@@ -25,7 +35,12 @@ public class VelocityOpMode extends LinearOpMode
     private Table2D modernRobotics_maxTorqueTbl =
             new Table2D(modernRobotics_maxTorqueTbl_velocity, modernRobotics_maxTorqueTbl_torque);
 
-    private TorqueActuator testTorqueActuator;
+    private TorqueActuator fr_tor_act;
+    private TorqueActuator fl_tor_act;
+    private TorqueActuator br_tor_act;
+    private TorqueActuator bl_tor_act;
+
+    private DcMotorPlant yellow_jacket_312_plant = null;
 
     @Override
     public void runOpMode()
@@ -35,14 +50,34 @@ public class VelocityOpMode extends LinearOpMode
 
         taskScheduler = new TaskScheduler();
 
-        testMotor = hardwareMap.get(DcMotor.class, "117 rpm");
-        velocityEncoder = new VelocityEncoder((float)13.7);
+        m_front_right = hardwareMap.get(DcMotor.class, "fr");
+        m_front_left = hardwareMap.get(DcMotor.class, "fl");
+        m_back_right = hardwareMap.get(DcMotor.class, "br");
+        m_back_left = hardwareMap.get(DcMotor.class, "bl");
 
-        testMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        testMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr_vel_enc = new VelocityEncoder((float)19.2);
+        fl_vel_enc = new VelocityEncoder((float)19.2);
+        br_vel_enc = new VelocityEncoder((float)19.2);
+        bl_vel_enc = new VelocityEncoder((float)19.2);
 
-        testTorqueActuator =
-                new TorqueActuator(testMotor, modernRobotics_maxTorqueTbl, (float)13.7);
+        m_front_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_front_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        m_front_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_front_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        m_back_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_back_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        m_back_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_back_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        m_front_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        m_back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+
+//        fr_tor_act = new TorqueActuator(m_front_right, modernRobotics_maxTorqueTbl, (float)13.7);
+//        fl_tor_act = new TorqueActuator(m_front_left, modernRobotics_maxTorqueTbl, (float)13.7);
+//        br_tor_act = new TorqueActuator(m_back_right, modernRobotics_maxTorqueTbl, (float)13.7);
+//        bl_tor_act = new TorqueActuator(m_back_left, modernRobotics_maxTorqueTbl, (float)13.7);
+
+        yellow_jacket_312_plant = DcMotorPlant.getGoBildaYellowJacket(312);
 
         modernRobotics_maxTorqueTbl.setDescendingX(true);
 
@@ -122,11 +157,11 @@ public class VelocityOpMode extends LinearOpMode
 
     private void taskFunction_10ms()
     {
-        testMotorControl();
     }
 
     private void taskFunction_20ms()
     {
+        calc_drive_base();
         SendTelemetry();
     }
 
@@ -140,11 +175,77 @@ public class VelocityOpMode extends LinearOpMode
 
     }
 
-    private void testMotorControl()
+    private void calc_drive_base()
     {
-        velocityEncoder.setFilterTimeConstant((float)FILTER_CONSTANT);
-        velocityEncoder.Update(testMotor.getCurrentPosition());
-        testTorqueActuator.RequestTorque(velocityEncoder.GetFilteredVelocity(), (float)TORQUE_REQUEST);
+        /* LOCALS */
+        float joystick_forward_demand;
+        float joystick_turn_demand;
+        float right_demand;
+        float left_demand;
+        float max;
+        double fr_motor_current;
+        double fl_motor_current;
+        double br_motor_current;
+        double bl_motor_current;
+        double fr_motor_estimated_torque;
+        double fl_motor_estimated_torque;
+        double br_motor_estimated_torque;
+        double bl_motor_estimated_torque;
+        double fr_motor_estimated_speed;
+        double fl_motor_estimated_speed;
+        double br_motor_estimated_speed;
+        double bl_motor_estimated_speed;
+
+
+
+        /* CONSTANTS */
+
+
+        joystick_forward_demand = -gamepad1.right_stick_y;
+        joystick_turn_demand = gamepad1.right_stick_x;
+
+        right_demand = joystick_forward_demand - joystick_turn_demand;
+        left_demand = joystick_forward_demand + joystick_turn_demand;
+        max = Math.max(Math.abs(right_demand), Math.abs(left_demand));
+
+        if (max > 1.0)
+        {
+            right_demand /= max;
+            left_demand /= max;
+        }
+
+        /* Set right and left motor powers */
+        m_front_right.setPower(right_demand);
+        m_back_right.setPower(right_demand);
+
+        m_front_left.setPower(left_demand);
+        m_back_left.setPower(left_demand);
+
+        /* Get the current for each motor */
+        fr_motor_current = ((DcMotorEx)m_front_right).getCurrent(CurrentUnit.AMPS);
+        fl_motor_current = ((DcMotorEx)m_front_left).getCurrent(CurrentUnit.AMPS);
+        br_motor_current = ((DcMotorEx)m_back_right).getCurrent(CurrentUnit.AMPS);
+        bl_motor_current = ((DcMotorEx)m_back_left).getCurrent(CurrentUnit.AMPS);
+
+        /* Use that current to estimate torque */
+        fr_motor_estimated_torque = yellow_jacket_312_plant.getTorque(fr_motor_current);
+        fl_motor_estimated_torque = yellow_jacket_312_plant.getTorque(fl_motor_current);
+        br_motor_estimated_torque = yellow_jacket_312_plant.getTorque(br_motor_current);
+        bl_motor_estimated_torque = yellow_jacket_312_plant.getTorque(bl_motor_current);
+
+        /* Use the estimated torque and current input voltage to determine estimated speed */
+        fr_motor_estimated_speed = yellow_jacket_312_plant.getSpeed(fr_motor_estimated_torque, m_front_right.getPower() * getBatteryVoltage());
+        fl_motor_estimated_speed = yellow_jacket_312_plant.getSpeed(fl_motor_estimated_torque, m_front_left.getPower() * getBatteryVoltage());
+        br_motor_estimated_speed = yellow_jacket_312_plant.getSpeed(br_motor_estimated_torque, m_back_right.getPower() * getBatteryVoltage());
+        bl_motor_estimated_speed = yellow_jacket_312_plant.getSpeed(bl_motor_estimated_torque, m_back_left.getPower() * getBatteryVoltage());
+
+        fr_vel_enc.Update(m_front_right.getCurrentPosition());
+        fl_vel_enc.Update(m_front_left.getCurrentPosition());
+        br_vel_enc.Update(m_back_right.getCurrentPosition());
+        bl_vel_enc.Update(m_back_left.getCurrentPosition());
+
+        telemetry.addData("FR Estimated Speed", fr_motor_estimated_speed);
+        telemetry.addData("FR Actual Speed", fr_vel_enc.GetFilteredVelocity());
     }
 
     private void SendTelemetry()
@@ -154,12 +255,19 @@ public class VelocityOpMode extends LinearOpMode
         telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
         telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
         telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
-        telemetry.addData("requestTorque", TORQUE_REQUEST);
-        telemetry.addData("Commanded Torque", testTorqueActuator.getCommandedTorque());
-        telemetry.addData("Set Power", testTorqueActuator.getSetPower());
-        telemetry.addData("Motor Velocity", velocityEncoder.GetFilteredVelocity());
 
         telemetry.update();
+    }
+
+    double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
     }
 
 }
