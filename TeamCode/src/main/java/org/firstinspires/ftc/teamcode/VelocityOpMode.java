@@ -69,15 +69,15 @@ public class VelocityOpMode extends LinearOpMode
         m_back_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_back_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        m_front_left.setDirection(DcMotorSimple.Direction.REVERSE);
-        m_back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        m_front_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        m_back_right.setDirection(DcMotorSimple.Direction.REVERSE);
 
 //        fr_tor_act = new TorqueActuator(m_front_right, modernRobotics_maxTorqueTbl, (float)13.7);
 //        fl_tor_act = new TorqueActuator(m_front_left, modernRobotics_maxTorqueTbl, (float)13.7);
 //        br_tor_act = new TorqueActuator(m_back_right, modernRobotics_maxTorqueTbl, (float)13.7);
 //        bl_tor_act = new TorqueActuator(m_back_left, modernRobotics_maxTorqueTbl, (float)13.7);
 
-        yellow_jacket_312_plant = DcMotorPlant.getGoBildaYellowJacket(312);
+        yellow_jacket_312_plant = DcMotorPlant.getGoBildaYellowJacket(265);
 
         modernRobotics_maxTorqueTbl.setDescendingX(true);
 
@@ -244,8 +244,11 @@ public class VelocityOpMode extends LinearOpMode
         br_vel_enc.Update(m_back_right.getCurrentPosition());
         bl_vel_enc.Update(m_back_left.getCurrentPosition());
 
+        telemetry.addData("FR Current", fr_motor_current);
+        telemetry.addData("FR Estimated Torque", fr_motor_estimated_torque);
         telemetry.addData("FR Estimated Speed", fr_motor_estimated_speed);
-        telemetry.addData("FR Actual Speed", fr_vel_enc.GetFilteredVelocity());
+        telemetry.addData("FR Vel Enc Speed", fr_vel_enc.GetVelocity()*60);
+        telemetry.addData("Speed Error", fr_motor_estimated_speed - (fr_vel_enc.GetVelocity()*60));
     }
 
     private void SendTelemetry()
