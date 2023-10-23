@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @TeleOp(name="VelocityOpMode", group="Linear OpMode")
 public class VelocityOpMode extends LinearOpMode
 {
-    public static double POWER_DEMAND = 0.0;
+    public static double SPEED_DEMAND = 0.0;
     public static double FILTER_CONSTANT = 0.3;
 
     private TaskScheduler taskScheduler = null;
@@ -125,11 +125,12 @@ public class VelocityOpMode extends LinearOpMode
 
     private void taskFunction_10ms()
     {
-        testMotorControl();
+
     }
 
     private void taskFunction_20ms()
     {
+        testMotorControl();
         SendTelemetry();
     }
 
@@ -149,23 +150,24 @@ public class VelocityOpMode extends LinearOpMode
         double motor_set_power;
         double motor_current;
         double motor_plant_torque;
-        double motor_plant_speed;
+        double motor_plant_voltage;
 
         /* Constants */
 
 
-        motor_set_power = POWER_DEMAND;
-        testMotor.setPower(motor_set_power);
 
         motor_current = ((DcMotorEx)testMotor).getCurrent(CurrentUnit.AMPS);
         motor_plant_torque = yellow_jacket_117rpm_plant.getTorque(motor_current);
-        motor_plant_speed =
-                yellow_jacket_117rpm_plant.getSpeed(motor_plant_torque,
-                        Math.abs(12.0*motor_set_power));
+        motor_plant_voltage = yellow_jacket_117rpm_plant.getVoltage(motor_plant_torque, gamepad1.right_stick_y*100);
+        motor_set_power = motor_plant_voltage / 12.0;
+
+        testMotor.setPower(motor_set_power);
 
         velocityEncoder.Update(testMotor.getCurrentPosition());
 
-        telemetry.addData("Plant Speed", motor_plant_speed);
+        telemetry.addData("Desired Speed", gamepad1.right_stick_y*100);
+        telemetry.addData("Plant Voltage", motor_plant_voltage);
+        telemetry.addData("Motor Power", motor_set_power);
         telemetry.addData("Plant Torque", motor_plant_torque);
         telemetry.addData("Motor Current", motor_current);
         telemetry.addData("DcMotorEx Speed",velocityEncoder.GetVelocity() * 60);
