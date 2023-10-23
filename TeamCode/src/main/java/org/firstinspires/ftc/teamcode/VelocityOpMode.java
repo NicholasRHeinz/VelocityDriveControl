@@ -5,13 +5,17 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 
 @Config
 @TeleOp(name="VelocityOpMode", group="Linear OpMode")
 public class VelocityOpMode extends LinearOpMode
 {
-    public static double TORQUE_REQUEST = 0.0;
+    public static double POWER_DEMAND = 0.0;
     public static double FILTER_CONSTANT = 0.3;
 
     private TaskScheduler taskScheduler = null;
@@ -25,7 +29,7 @@ public class VelocityOpMode extends LinearOpMode
     private Table2D modernRobotics_maxTorqueTbl =
             new Table2D(modernRobotics_maxTorqueTbl_velocity, modernRobotics_maxTorqueTbl_torque);
 
-    private TorqueActuator testTorqueActuator;
+    private DcMotorPlant yellow_jacket_117rpm_plant;
 
     @Override
     public void runOpMode()
@@ -36,15 +40,14 @@ public class VelocityOpMode extends LinearOpMode
         taskScheduler = new TaskScheduler();
 
         testMotor = hardwareMap.get(DcMotor.class, "117 rpm");
-        velocityEncoder = new VelocityEncoder((float)13.7);
+        velocityEncoder = new VelocityEncoder((float)51.28);
 
         testMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         testMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        testTorqueActuator =
-                new TorqueActuator(testMotor, modernRobotics_maxTorqueTbl, (float)13.7);
-
         modernRobotics_maxTorqueTbl.setDescendingX(true);
+
+        yellow_jacket_117rpm_plant = DcMotorPlant.getGoBildaYellowJacket(100);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -142,24 +145,47 @@ public class VelocityOpMode extends LinearOpMode
 
     private void testMotorControl()
     {
-        velocityEncoder.setFilterTimeConstant((float)FILTER_CONSTANT);
+        /* Locals */
+        double motor_set_power;
+        double motor_current;
+        double motor_plant_torque;
+        double motor_plant_speed;
+
+        /* Constants */
+
+
+        motor_set_power = POWER_DEMAND;
+        testMotor.setPower(motor_set_power);
+
+        motor_current = ((DcMotorEx)testMotor).getCurrent(CurrentUnit.AMPS);
+        motor_plant_torque = yellow_jacket_117rpm_plant.getTorque(motor_current);
+        motor_plant_speed =
+                yellow_jacket_117rpm_plant.getSpeed(motor_plant_torque,
+                        Math.abs(12.0*motor_set_power));
+
         velocityEncoder.Update(testMotor.getCurrentPosition());
-        testTorqueActuator.RequestTorque(velocityEncoder.GetFilteredVelocity(), (float)TORQUE_REQUEST);
+
+        telemetry.addData("Plant Speed", motor_plant_speed);
+        telemetry.addData("Plant Torque", motor_plant_torque);
+        telemetry.addData("Motor Current", motor_current);
+        telemetry.addData("DcMotorEx Speed",velocityEncoder.GetVelocity() * 60);
     }
 
     private void SendTelemetry()
     {
         /* Task Scheduler Telemetry */
-        telemetry.addData("10ms Time", (float)taskScheduler.task_10ms.taskElapsedTime/1000);
-        telemetry.addData("20ms Time", (float)taskScheduler.task_20ms.taskElapsedTime/1000);
-        telemetry.addData("50ms Time", (float)taskScheduler.task_50ms.taskElapsedTime/1000);
-        telemetry.addData("250ms Time", (float)taskScheduler.task_250ms.taskElapsedTime/1000);
-        telemetry.addData("requestTorque", TORQUE_REQUEST);
-        telemetry.addData("Commanded Torque", testTorqueActuator.getCommandedTorque());
-        telemetry.addData("Set Power", testTorqueActuator.getSetPower());
-        telemetry.addData("Motor Velocity", velocityEncoder.GetFilteredVelocity());
-
         telemetry.update();
+    }
+
+    double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
     }
 
 }
